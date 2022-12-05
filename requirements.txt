@@ -1,4 +1,4 @@
-opencv_contrib_python
+opencv-python
 six
 tensorflow
 aiohttp
@@ -7,5 +7,4 @@ aiortc
 numpy
 Pillow
 tf_slim
-opencv-python
-gunicorn
+flask

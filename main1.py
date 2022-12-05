@@ -9,6 +9,7 @@ import platform
 import ssl
 import time
 from aiohttp import web
+from flask import Flask, flash, jsonify, make_response, redirect, render_template, request, url_for
 from aiortc import RTCPeerConnection, RTCSessionDescription
 from aiortc.contrib.media import MediaPlayer
 from faceregtrack import FacialRecognitionTrack
@@ -18,9 +19,9 @@ from clienthandler import Client, ClientManager
 from facerec_core.face_feature import FaceFeature
 from datasetmanager import FaceDataManager
 ROOT = os.path.dirname(__file__)
-routes = web.RouteTableDef()
-_id = 0
 
+_id = 0
+app = Flask(__name__)
 def create_new_client(pc):
     global clients, _id
     clients[_id] = Client(pc, _id)
@@ -32,27 +33,28 @@ async def remove_client(_id):
         await clients[_id].close()
         del clients[_id]
 
-@routes.get("/")
+@app.route("/")
 async def index(request):
-    content = open(os.path.join(ROOT, "frontend/client.html"), "r").read()
-    return web.Response(content_type="text/html", text=content)
+    # content = open(os.path.join(ROOT, "frontend/client.html"), "r").read()
+    return render_template("client.html")
+    # return web.Response(content_type="text/html", text=content)
 
-@routes.get("/sample.html")
-async def sample_html(request):
-    content = open(os.path.join(ROOT, "frontend/sample.html"), "r").read()
-    return web.Response(content_type="text/html", text=content)
+# @app.route('/sample.html')
+# async def sample_html(request):
+#     content = open(os.path.join(ROOT,  "frontend/sample.html"), "r").read()
+#     return web.Response(content_type="text/html", text=content)
 
-@routes.get("/js/main.js")
+@app.route("/js/main.js")
 async def main_js(request):
     content = open(os.path.join(ROOT, "frontend/js/main.js"), "r").read()
     return web.Response(content_type="application/javascript", text=content)
 
-@routes.get("/js/video_stream.js")
+@routes.get('/js/video_stream.js')
 async def video_stream_js(request):
     content = open(os.path.join(ROOT, "frontend/js/video_stream.js"), "r").read()
     return web.Response(content_type="application/javascript", text=content)
 
-@routes.get("/js/sample.js")
+@routes.get('/js/sample.js')
 async def sample_js(request):
     content = open(os.path.join(ROOT, "frontend/js/sample.js"), "r").read()
     return web.Response(content_type="application/javascript", text=content)
@@ -63,7 +65,7 @@ def recog_worker(client, data):
         client.generate_trackers_face_features()
 
 
-@routes.post("/offer")
+@routes.post('/offer')
 async def offer(request):
     params = await request.json()
     print(params);
