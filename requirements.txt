@@ -1,0 +1,11 @@
+opencv_contrib_python
+six
+tensorflow
+aiohttp
+av
+aiortc
+numpy
+Pillow
+tf_slim
+opencv-python
+gunicorn
