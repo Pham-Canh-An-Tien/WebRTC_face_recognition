@@ -14,14 +14,9 @@ class FaceDataManager(object):
                 self.dataset[label] = []
             for i in range(len(embs)):
                 self.dataset[label].append(embs[i])
-        #print(self.dataset)
         self.lock.release()
 
     def find_match(self, emb, threshold = 0.7):
-        '''
-        Given a single embedding, find the closest match
-            * TO DO: implement a more sophisicated way to find best match *
-        '''
         current_min = threshold # i know this is dirty :D
         best_subject = "Unknown"
         for subject in self.dataset:

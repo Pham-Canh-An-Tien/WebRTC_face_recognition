@@ -1,4 +1,7 @@
 
+## Tien Pham
+## 1001909301
+
 import argparse
 import asyncio
 import json
@@ -21,6 +24,8 @@ ROOT = os.path.dirname(__file__)
 routes = web.RouteTableDef()
 _id = 0
 
+# Create the web application
+app = web.Application()
 def create_new_client(pc):
     global clients, _id
     clients[_id] = Client(pc, _id)
@@ -32,16 +37,13 @@ async def remove_client(_id):
         await clients[_id].close()
         del clients[_id]
 
+## Main request to the home page
 @routes.get("/")
 async def index(request):
     content = open(os.path.join(ROOT, "frontend/client.html"), "r").read()
     return web.Response(content_type="text/html", text=content)
 
-@routes.get("/sample.html")
-async def sample_html(request):
-    content = open(os.path.join(ROOT, "frontend/sample.html"), "r").read()
-    return web.Response(content_type="text/html", text=content)
-
+## Call the main function from main.js
 @routes.get("/js/main.js")
 async def main_js(request):
     content = open(os.path.join(ROOT, "frontend/js/main.js"), "r").read()
@@ -71,9 +73,6 @@ async def offer(request):
 
     pc = RTCPeerConnection()
     client_id = client_manager.create_new_client(pc)
-   # data = [True]
-   #recog_worker_thread = threading.Thread(target=recog_worker,args=(client_manager.get_client(client_id),data,))
-    #recog_worker_thread.start()
 
 
     @pc.on("iceconnectionstatechange")
@@ -141,7 +140,7 @@ async def on_shutdown(app):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="FaceRTC")
+    parser = argparse.ArgumentParser(description="Web RTC Face Recognition")
     parser.add_argument("--cert-file", help="SSL certificate file (for HTTPS)")
     parser.add_argument("--key-file", help="SSL key file (for HTTPS)")
     parser.add_argument(
@@ -159,13 +158,16 @@ if __name__ == "__main__":
     else:
         ssl_context = None
 
-    app = web.Application()
     app.on_shutdown.append(on_shutdown)
     app.add_routes(routes)
     MTCNNGraph = FaceRecGraph()
     FaceGraph = FaceRecGraph()
-    face_detect = MTCNNDetect(MTCNNGraph, scale_factor=2) #scale_factor, rescales image for faster detection
+
+    ## Using MTCNN for face detection
+    face_detect = MTCNNDetect(MTCNNGraph, scale_factor=2) 
     face_recog = FaceFeature(FaceGraph)
     dataset = FaceDataManager()
     client_manager = ClientManager(dataset, face_recog)
+
+    ## Run the web app at port 8080
     web.run_app(app, port=args.port, ssl_context=ssl_context)

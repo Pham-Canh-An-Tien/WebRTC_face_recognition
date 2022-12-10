@@ -1,7 +1,5 @@
-'''
-@Author: David Vu
-Run the pretrained model to extract 128D face features
-'''
+## Tien Pham
+## 1001909301
 
 import tensorflow.compat.v1 as tf
 tf.disable_v2_behavior()
@@ -12,10 +10,6 @@ import os
 
 class FaceFeature(object):
     def __init__(self, face_rec_graph, model_path = './facerec_core/models/20170512-110547.pb'):
-        '''
-        :param face_rec_sess: FaceRecSession object
-        :param model_path:
-        '''
         print("Loading model...")
         with face_rec_graph.graph.as_default():
             self.sess = tf.Session()
@@ -40,8 +34,6 @@ class FaceFeature(object):
 
 
     def __load_model(self, model):
-        # Check if the model is a model directory (containing a metagraph and a checkpoint file)
-        #  or if it is a protobuf file with a frozen graph
         model_exp = os.path.expanduser(model)
         if os.path.isfile(model_exp):
             print('Model filename: %s' % model_exp)

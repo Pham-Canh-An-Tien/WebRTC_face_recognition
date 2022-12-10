@@ -1,21 +1,15 @@
-import asyncio
+## Tien Pham
+## 1001909301
 
-
+## Import
 import numpy as np
 import threading
-
-
-'''
-ClientHandler
-'''
+import asyncio
 import cv2
 import threading
+  
 
 
-'''
-Tracker framework
-will implement in the future
-'''
 class FaceTracker(object):
     def __init__(self, registering = False, label = "Detecting..."):
         self.faces = []
@@ -81,7 +75,6 @@ class FaceTracker(object):
         self.faces.clear()
         self.lock.release()
 
-  
 class Client(object):
     def __init__(self, pc, _id, dataset, face_recog):
         self.pc = pc
@@ -108,12 +101,12 @@ class Client(object):
             tracker.lock.release()
             for emb in processing_embs:
                 tracker.add_new_recog_result(self.dataset.find_match(emb))
-            tracker.move_emb_pointer(len(processing_embs)) #update unprocessed embedding pointer
-            tracker.update_label() #determine the updated label based on the new recog result
+            tracker.move_emb_pointer(len(processing_embs))
+            tracker.update_label()
 
     def generate_trackers_face_features(self):
         for tracker in self.trackers.values():
-            if len(tracker.faces) > 0: #generate in a batch of 5
+            if len(tracker.faces) > 0:
                 tracker.merge_new_embeddings(self.face_recog.get_features(tracker.faces))
                 tracker.purge_faces()
             if not tracker.registering:
@@ -161,15 +154,14 @@ class Client(object):
                 print(e)
 
 
-'''
-Manage all clients
-'''
+
+## Go to all client
 class ClientManager(object):
     def __init__(self, dataset, face_recog):
-        self.clients = dict() #a dictionary of clients
+        self.clients = dict()
         self.id = 0
         self.face_recog = face_recog
-        self.dataset = dataset #global face features dataset
+        self.dataset = dataset
 
     def create_new_client(self, pc):
         self.clients[self.id] = Client(pc, self.id,self.dataset, self.face_recog)
@@ -177,12 +169,8 @@ class ClientManager(object):
         return self.id - 1;
 
 
-
+## create face feature for all client
     def generate_client_face_features(self, _id):
-        '''
-        Generate face features for a clients
-            @param _id client_id
-        '''
         assert _id in self.clients
         client = self.clients[_id]
         client.generate_trackers_face_features();
@@ -191,8 +179,6 @@ class ClientManager(object):
     def recognition_loop(self):
         for client_id in self.clients:
             generate_client_face_features(self, client_id)
-            # if not self.clients.registering:
-            #     update_client_recog_results(self, client_id)
 
     def get_client(self, _id):
         assert _id in self.clients
